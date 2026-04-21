@@ -1307,6 +1307,51 @@ input { font-family: inherit; }
   transform: rotate(180deg);
 }
 
+/* Botón de refresh manual */
+.reuniones-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.reuniones-panel-refresh {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+  transition: all var(--duration);
+  flex-shrink: 0;
+  padding: 0;
+  font-family: inherit;
+}
+
+.reuniones-panel-refresh:hover:not(:disabled) {
+  background: var(--royal-10);
+  color: var(--royal);
+  border-color: var(--royal);
+}
+
+.reuniones-panel-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reuniones-panel-refresh svg {
+  width: 13px;
+  height: 13px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Badge de conteo cuando está colapsado */
 .reuniones-panel-collapsed-badge {
   display: none;
@@ -1495,6 +1540,588 @@ input { font-family: inherit; }
   background: var(--state-progress-bg);
   color: #B45309;
   border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* ==========================================================
+   TABLEROS VIEW — Embed Tableau Cloud
+========================================================== */
+.tableros-wrap {
+  padding: 2rem clamp(1rem, 3vw, 2.5rem);
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.tableros-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tableros-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--deep);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
+}
+
+.tableros-subtitle {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  font-weight: 500;
+}
+
+.tableros-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.85rem;
+  background: var(--royal-04);
+  border: 1px solid var(--royal-10);
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--royal);
+  font-weight: 600;
+}
+
+.tableros-info svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tableros-category {
+  margin-bottom: 2rem;
+}
+
+.tableros-category-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tableros-category-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--deep);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tableros-category-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  background: var(--bg-subtle);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.tableros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .tableros-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tablero-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--duration);
+}
+
+.tablero-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--royal-10);
+}
+
+.tablero-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem 1.15rem;
+  gap: 0.85rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-subtle);
+}
+
+.tablero-card-title-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.tablero-card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--deep);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin-bottom: 3px;
+}
+
+.tablero-card-desc {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.tablero-card-open {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--royal);
+  color: #FFFFFF;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all var(--duration);
+  flex-shrink: 0;
+}
+
+.tablero-card-open:hover {
+  background: var(--deep);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(31, 73, 182, 0.3);
+}
+
+.tablero-card-open svg {
+  width: 12px;
+  height: 12px;
+}
+
+.tablero-card-preview {
+  position: relative;
+  height: 340px;
+  background: var(--bg-subtle);
+  overflow: hidden;
+}
+
+.tablero-card-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* Overlay que aparece en hover sobre el iframe para "Ver completo" */
+.tablero-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 31, 77, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration);
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+
+.tablero-card:hover .tablero-card-overlay {
+  opacity: 1;
+}
+
+.tablero-card-overlay-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  background: #FFFFFF;
+  color: var(--deep);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transform: translateY(10px);
+  transition: transform var(--duration);
+}
+
+.tablero-card:hover .tablero-card-overlay-btn {
+  transform: translateY(0);
+}
+
+.tablero-card-overlay-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tableros-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-dim);
+}
+
+.tableros-empty svg {
+  width: 56px;
+  height: 56px;
+  color: var(--text-faint);
+  margin-bottom: 1rem;
+}
+
+.tableros-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep);
+  margin-bottom: 0.5rem;
+}
+
+.tableros-empty-desc {
+  font-size: 13px;
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.tableros-empty-desc code {
+  background: var(--bg-subtle);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 11.5px;
+  color: var(--royal);
+  border: 1px solid var(--border);
+}
+
+/* Botón agregar tablero */
+.tableros-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-add-tablero {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--royal);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.btn-add-tablero:hover {
+  background: var(--deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 73, 182, 0.35);
+}
+
+.btn-add-tablero svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Botones de acciones en la card */
+.tablero-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.tablero-card-menu-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all var(--duration);
+  padding: 0;
+  font-family: inherit;
+}
+
+.tablero-card-menu-btn:hover {
+  background: var(--royal-10);
+  color: var(--royal);
+  border-color: var(--royal);
+}
+
+.tablero-card-menu-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ==========================================================
+   MODAL: Agregar/Editar tablero
+========================================================== */
+.tablero-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 31, 77, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s var(--ease);
+  padding: 1rem;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.tablero-modal {
+  background: var(--bg);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.25s var(--ease);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.tablero-modal-header {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-subtle);
+}
+
+.tablero-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep);
+  letter-spacing: -0.015em;
+}
+
+.tablero-modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all var(--duration);
+}
+
+.tablero-modal-close:hover {
+  background: var(--border);
+  color: var(--deep);
+}
+
+.tablero-modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tablero-modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tablero-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.tablero-form-field label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--deep);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tablero-form-field .required {
+  color: var(--state-overdue);
+  margin-left: 3px;
+}
+
+.tablero-form-field input[type="text"],
+.tablero-form-field input[type="number"] {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--deep);
+  background: var(--bg);
+  transition: all var(--duration);
+  box-sizing: border-box;
+}
+
+.tablero-form-field input:focus {
+  outline: none;
+  border-color: var(--royal);
+  box-shadow: 0 0 0 3px var(--royal-10);
+}
+
+.tablero-form-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.tablero-form-preview {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 300px;
+  background: var(--bg-subtle);
+}
+
+.tablero-form-preview iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.tablero-form-error {
+  background: var(--state-overdue-bg);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: var(--state-overdue);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tablero-modal-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.tablero-modal-footer-right {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.tablero-btn-primary {
+  padding: 9px 18px;
+  background: var(--royal);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration);
+  font-family: inherit;
+}
+
+.tablero-btn-primary:hover:not(:disabled) {
+  background: var(--deep);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 73, 182, 0.35);
+}
+
+.tablero-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tablero-btn-secondary {
+  padding: 9px 16px;
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration);
+  font-family: inherit;
+}
+
+.tablero-btn-secondary:hover {
+  background: var(--royal-10);
+  color: var(--royal);
+  border-color: var(--royal);
+}
+
+.tablero-btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  background: transparent;
+  color: var(--state-overdue);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration);
+  font-family: inherit;
+}
+
+.tablero-btn-delete:hover:not(:disabled) {
+  background: var(--state-overdue-bg);
+  border-color: var(--state-overdue);
+}
+
+.tablero-btn-delete:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tablero-btn-delete svg {
+  width: 13px;
+  height: 13px;
 }
 
 /* ==========================================================
@@ -3823,6 +4450,10 @@ input { font-family: inherit; }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         <span>Métricas</span>
       </button>
+      <button class="view-tab" data-view="tableros">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/><rect x="13" y="13" width="4" height="4"/></svg>
+        <span>Tableros</span>
+      </button>
     </div>
 
     <button class="btn-new-activity" id="btn-new-activity" onclick="openNewActivityDrawer()">
@@ -3866,6 +4497,10 @@ input { font-family: inherit; }
 
       <section class="view" id="view-metrics">
         <div class="metrics-wrap" id="metrics"></div>
+      </section>
+
+      <section class="view" id="view-tableros">
+        <div class="tableros-wrap" id="tableros"></div>
       </section>
     </div>
   </main>
@@ -7104,6 +7739,7 @@ let state = {
   frenteOrden: {},  // { 'Growth': 1, 'Brand': 2, ... }
   reuniones: [],    // reuniones cacheadas de Google Calendar
   reunionesPanelCollapsed: false,  // estado colapsado del panel lateral
+  tableros: [],     // tableros de Tableau desde Supabase
 };
 
 async function init() {
@@ -7115,6 +7751,15 @@ async function init() {
     await loadFromSupabase();
     // Auto-refresh cada 30 segundos
     setInterval(loadFromSupabase, 30000);
+
+    // Refresh del panel de reuniones cada minuto
+    // (para actualizar "En curso", "en X min", "ya pasó", etc.)
+    setInterval(async () => {
+      if (state.view === 'home') {
+        // Traer reuniones frescas de Supabase
+        await refreshReunionesFromSupabase();
+      }
+    }, 60000);
   } else {
     state.data = parseData(EMBEDDED_DATA);
     setSourceStatus('local', 'Datos locales');
@@ -7155,11 +7800,12 @@ async function loadFromSupabase() {
   try {
     setSourceStatus('sync', 'Cargando…');
 
-    // Cargar actividades, orden de frentes Y reuniones en paralelo
-    const [rows, ordenRows, reunionesRows] = await Promise.all([
+    // Cargar actividades, orden de frentes, reuniones Y tableros en paralelo
+    const [rows, ordenRows, reunionesRows, tablerosRows] = await Promise.all([
       supabaseRequest('actividades?select=*&order=fecha_cierre.asc.nullslast'),
       supabaseRequest('frente_orden?select=*&order=posicion.asc').catch(() => []),
-      supabaseRequest('reuniones_cache?select=*&order=inicio.asc').catch(() => [])
+      supabaseRequest('reuniones_cache?select=*&order=inicio.asc').catch(() => []),
+      supabaseRequest('tableros?select=*&visible=eq.true&order=orden.asc').catch(() => [])
     ]);
 
     // Guardar orden en state
@@ -7176,6 +7822,9 @@ async function loadFromSupabase() {
       inicio: new Date(r.inicio),
       fin: new Date(r.fin)
     })) : [];
+
+    // Guardar tableros en state
+    state.tableros = Array.isArray(tablerosRows) ? tablerosRows : [];
 
     // Preservar scroll
     const scrollTop = document.querySelector('.view-container')?.scrollTop || 0;
@@ -7661,9 +8310,14 @@ function renderReunionesPanel() {
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           <span>Calendario</span>
         </div>
-        <button class="reuniones-panel-toggle" onclick="toggleReunionesPanel()" title="Colapsar calendario">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
+        <div class="reuniones-panel-actions">
+          <button class="reuniones-panel-refresh" onclick="manualRefreshReuniones(event)" title="Actualizar reuniones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+          <button class="reuniones-panel-toggle" onclick="toggleReunionesPanel()" title="Colapsar calendario">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+        </div>
       </div>
       <div class="reuniones-panel-body">
   `;
@@ -7686,6 +8340,63 @@ function renderReunionesPanel() {
 function toggleReunionesPanel() {
   state.reunionesPanelCollapsed = !state.reunionesPanelCollapsed;
   renderHome();
+}
+
+// Refresca solo el panel de reuniones (sin re-renderizar todo Mi semana)
+// Útil para actualizar "En curso" y "en X min" cada minuto
+function refreshReunionesPanel() {
+  const existingPanel = document.querySelector('.reuniones-panel');
+  if (!existingPanel) return;
+
+  const newHtml = renderReunionesPanel();
+  if (!newHtml) {
+    existingPanel.remove();
+    return;
+  }
+
+  // Crear un contenedor temporal para parsear el HTML nuevo
+  const temp = document.createElement('div');
+  temp.innerHTML = newHtml.trim();
+  const newPanel = temp.firstElementChild;
+
+  if (newPanel) {
+    existingPanel.replaceWith(newPanel);
+  }
+}
+
+// Refresh manual con feedback visual
+async function manualRefreshReuniones(event) {
+  event.stopPropagation();
+  const btn = event.currentTarget;
+  const svg = btn.querySelector('svg');
+
+  btn.disabled = true;
+  if (svg) svg.style.animation = 'spin 0.8s linear';
+
+  await refreshReunionesFromSupabase();
+
+  setTimeout(() => {
+    btn.disabled = false;
+    if (svg) svg.style.animation = '';
+  }, 800);
+}
+
+// Refresca las reuniones desde Supabase y actualiza el panel
+async function refreshReunionesFromSupabase() {
+  if (!USE_SUPABASE) return;
+  try {
+    const reunionesRows = await supabaseRequest('reuniones_cache?select=*&order=inicio.asc');
+    state.reuniones = Array.isArray(reunionesRows) ? reunionesRows.map(r => ({
+      ...r,
+      inicio: new Date(r.inicio),
+      fin: new Date(r.fin)
+    })) : [];
+    if (state.view === 'home') {
+      refreshReunionesPanel();
+    }
+  } catch (e) {
+    console.warn('Error refrescando reuniones:', e);
+  }
 }
 
 function renderReunionMini(r, now) {
@@ -8581,6 +9292,7 @@ function renderAll() {
   else if (state.view === 'table') renderTable();
   else if (state.view === 'kanban') renderKanban();
   else if (state.view === 'metrics') renderMetrics();
+  else if (state.view === 'tableros') renderTableros();
 }
 
 /* ==========================================================
@@ -9324,6 +10036,385 @@ function renderTable() {
       openDrawer(state.data[idx]);
     });
   });
+}
+
+/* ============================================================
+   TABLEROS VIEW — Embed de Tableau Cloud
+============================================================ */
+function renderTableros() {
+  const container = document.getElementById('tableros');
+  const tableros = state.tableros || [];
+
+  // Header siempre visible, con botón de agregar
+  let html = `
+    <div class="tableros-header">
+      <div>
+        <h2 class="tableros-title">Tableros de Tableau</h2>
+        <div class="tableros-subtitle">${tableros.length} ${tableros.length === 1 ? 'tablero' : 'tableros'}${tableros.length > 0 ? ' — click en cualquiera para abrirlo completo' : ''}</div>
+      </div>
+      <div class="tableros-header-actions">
+        <div class="tableros-info">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span>Requiere login en Tableau</span>
+        </div>
+        <button class="btn-add-tablero" onclick="openTableroForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Agregar tablero</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  if (tableros.length === 0) {
+    html += `
+      <div class="tableros-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <rect x="7" y="7" width="4" height="4"/>
+          <rect x="13" y="7" width="4" height="4"/>
+          <rect x="7" y="13" width="4" height="4"/>
+          <rect x="13" y="13" width="4" height="4"/>
+        </svg>
+        <div class="tableros-empty-title">No hay tableros configurados</div>
+        <div class="tableros-empty-desc">
+          Click en <strong>"Agregar tablero"</strong> arriba para crear el primero. Solo necesitas el URL del tablero en Tableau Cloud.
+        </div>
+      </div>
+    `;
+    container.innerHTML = html;
+    return;
+  }
+
+  // Agrupar por categoría
+  const porCategoria = {};
+  tableros.forEach(t => {
+    const cat = t.categoria || 'General';
+    if (!porCategoria[cat]) porCategoria[cat] = [];
+    porCategoria[cat].push(t);
+  });
+
+  Object.entries(porCategoria).forEach(([categoria, items]) => {
+    html += `
+      <div class="tableros-category">
+        <div class="tableros-category-header">
+          <span class="tableros-category-name">${escapeHtml(categoria)}</span>
+          <span class="tableros-category-count">${items.length}</span>
+        </div>
+        <div class="tableros-grid">
+          ${items.map(t => renderTableroCard(t)).join('')}
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderTableroCard(t) {
+  const embedUrl = t.embed_url || t.tableau_url;
+  const openUrl = t.tableau_url;
+
+  return `
+    <div class="tablero-card">
+      <div class="tablero-card-header">
+        <div class="tablero-card-title-block">
+          <div class="tablero-card-title">${escapeHtml(t.titulo)}</div>
+          ${t.descripcion ? `<div class="tablero-card-desc">${escapeHtml(t.descripcion)}</div>` : ''}
+        </div>
+        <div class="tablero-card-actions">
+          <button class="tablero-card-menu-btn" onclick="openTableroForm(${t.id})" title="Editar tablero">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <a href="${openUrl}" target="_blank" rel="noopener noreferrer" class="tablero-card-open" title="Abrir en Tableau">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+            <span>Abrir</span>
+          </a>
+        </div>
+      </div>
+      <div class="tablero-card-preview">
+        <iframe
+          src="${embedUrl}"
+          title="${escapeHtml(t.titulo)}"
+          loading="lazy"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          frameborder="0">
+        </iframe>
+        <div class="tablero-card-overlay" onclick="window.open('${openUrl}', '_blank', 'noopener')">
+          <div class="tablero-card-overlay-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Ver completo
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   FORMULARIO: Agregar/Editar tablero
+============================================================ */
+function openTableroForm(tableroId) {
+  // Si recibe un ID, está editando un tablero existente. Si no, es nuevo.
+  const tablero = tableroId ? state.tableros.find(t => t.id === tableroId) : null;
+  const isEdit = !!tablero;
+
+  // Obtener categorías existentes para el datalist
+  const categoriasExistentes = [...new Set(state.tableros.map(t => t.categoria).filter(Boolean))];
+
+  // Crear modal
+  const backdrop = document.createElement('div');
+  backdrop.className = 'tablero-modal-backdrop';
+  backdrop.onclick = (e) => {
+    if (e.target === backdrop) closeTableroForm();
+  };
+
+  backdrop.innerHTML = `
+    <div class="tablero-modal">
+      <div class="tablero-modal-header">
+        <h3>${isEdit ? 'Editar tablero' : 'Agregar nuevo tablero'}</h3>
+        <button class="tablero-modal-close" onclick="closeTableroForm()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="tablero-modal-body">
+        <div class="tablero-form-field">
+          <label>Título <span class="required">*</span></label>
+          <input type="text" id="tf-titulo" placeholder="Ej: Reporte Growth Q2" value="${isEdit ? escapeAttr(tablero.titulo) : ''}" autofocus>
+        </div>
+
+        <div class="tablero-form-field">
+          <label>Descripción</label>
+          <input type="text" id="tf-descripcion" placeholder="Una línea breve de qué muestra el tablero" value="${isEdit ? escapeAttr(tablero.descripcion || '') : ''}">
+        </div>
+
+        <div class="tablero-form-field">
+          <label>Categoría</label>
+          <input type="text" id="tf-categoria" list="tf-categorias-list" placeholder="Ej: Ejecutivos, Operaciones, Canales" value="${isEdit ? escapeAttr(tablero.categoria || '') : ''}">
+          <datalist id="tf-categorias-list">
+            ${categoriasExistentes.map(c => `<option value="${escapeAttr(c)}">`).join('')}
+          </datalist>
+          <div class="tablero-form-hint">Agrupa tableros similares. Escribe una nueva o elige una existente.</div>
+        </div>
+
+        <div class="tablero-form-field">
+          <label>URL del tablero en Tableau Cloud <span class="required">*</span></label>
+          <input type="text" id="tf-url" placeholder="https://prod-useast-b.online.tableau.com/#/site/..." value="${isEdit ? escapeAttr(tablero.tableau_url) : ''}">
+          <div class="tablero-form-hint">Copia y pega el URL desde la barra del navegador cuando estés viendo el tablero en Tableau.</div>
+        </div>
+
+        <div class="tablero-form-field">
+          <label>Orden</label>
+          <input type="number" id="tf-orden" placeholder="0" value="${isEdit ? tablero.orden : (state.tableros.length + 1) * 10}" min="0">
+          <div class="tablero-form-hint">Menor número aparece primero. Usa múltiplos de 10 para facilitar reordenar después.</div>
+        </div>
+
+        <div id="tf-preview-container" style="display:none">
+          <label>Preview</label>
+          <div class="tablero-form-preview">
+            <iframe id="tf-preview-iframe" loading="lazy" frameborder="0"></iframe>
+          </div>
+          <div class="tablero-form-hint">Si no se ve, asegúrate de estar logueado en Tableau en este navegador.</div>
+        </div>
+
+        <div id="tf-error" class="tablero-form-error" style="display:none"></div>
+      </div>
+      <div class="tablero-modal-footer">
+        ${isEdit ? `
+          <button class="tablero-btn-delete" onclick="deleteTablero(${tablero.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Eliminar
+          </button>
+        ` : '<div></div>'}
+        <div class="tablero-modal-footer-right">
+          <button class="tablero-btn-secondary" onclick="testTableroUrl()">Probar URL</button>
+          <button class="tablero-btn-primary" onclick="saveTablero(${tableroId || 'null'})">
+            ${isEdit ? 'Guardar cambios' : 'Agregar tablero'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  // Focus en el primer input
+  setTimeout(() => {
+    const first = document.getElementById('tf-titulo');
+    if (first) first.focus();
+  }, 100);
+
+  // Atajo: Escape para cerrar
+  document.addEventListener('keydown', handleTableroFormKeydown);
+}
+
+function handleTableroFormKeydown(e) {
+  if (e.key === 'Escape') {
+    closeTableroForm();
+  }
+}
+
+function closeTableroForm() {
+  const backdrop = document.querySelector('.tablero-modal-backdrop');
+  if (backdrop) backdrop.remove();
+  document.removeEventListener('keydown', handleTableroFormKeydown);
+}
+
+// Convierte la URL normal de Tableau Cloud a URL embed
+function buildEmbedUrl(url) {
+  if (!url) return '';
+
+  // Transformar: #/site/xxx/ → /t/xxx/
+  let embed = url.replace(/#\/site\//, '/t/');
+
+  // Si el URL ya tiene parámetros (después de ?), agregar con &
+  const separator = embed.includes('?') ? '&' : '?';
+  // Solo agregar parámetros de embed si no los tiene ya
+  if (!embed.includes(':embed=yes')) {
+    embed += `${separator}:embed=yes&:showVizHome=no&:toolbar=no`;
+  }
+  return embed;
+}
+
+// Probar el URL y mostrar preview
+function testTableroUrl() {
+  const url = document.getElementById('tf-url').value.trim();
+  const errorEl = document.getElementById('tf-error');
+  const previewContainer = document.getElementById('tf-preview-container');
+  const iframe = document.getElementById('tf-preview-iframe');
+
+  errorEl.style.display = 'none';
+
+  if (!url) {
+    errorEl.textContent = 'Pega un URL para probar';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  if (!url.includes('tableau.com')) {
+    errorEl.textContent = 'El URL debe ser de Tableau Cloud (*.tableau.com)';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const embedUrl = buildEmbedUrl(url);
+  iframe.src = embedUrl;
+  previewContainer.style.display = 'block';
+}
+
+async function saveTablero(tableroId) {
+  const titulo = document.getElementById('tf-titulo').value.trim();
+  const descripcion = document.getElementById('tf-descripcion').value.trim();
+  const categoria = document.getElementById('tf-categoria').value.trim() || 'General';
+  const url = document.getElementById('tf-url').value.trim();
+  const orden = parseInt(document.getElementById('tf-orden').value) || 0;
+  const errorEl = document.getElementById('tf-error');
+
+  errorEl.style.display = 'none';
+
+  // Validaciones
+  if (!titulo) {
+    errorEl.textContent = 'El título es obligatorio';
+    errorEl.style.display = 'block';
+    return;
+  }
+  if (!url) {
+    errorEl.textContent = 'El URL de Tableau es obligatorio';
+    errorEl.style.display = 'block';
+    return;
+  }
+  if (!url.includes('tableau.com')) {
+    errorEl.textContent = 'El URL debe ser de Tableau Cloud (*.tableau.com)';
+    errorEl.style.display = 'block';
+    return;
+  }
+
+  const embedUrl = buildEmbedUrl(url);
+
+  const payload = {
+    titulo,
+    descripcion: descripcion || null,
+    categoria,
+    tableau_url: url,
+    embed_url: embedUrl,
+    orden,
+    visible: true
+  };
+
+  const saveBtn = document.querySelector('.tablero-btn-primary');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Guardando...';
+
+  try {
+    if (tableroId) {
+      // Update
+      await supabaseRequest(`tableros?id=eq.${tableroId}`, {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+    } else {
+      // Insert
+      await supabaseRequest('tableros', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify(payload)
+      });
+    }
+
+    closeTableroForm();
+
+    // Recargar tableros de Supabase y re-renderizar
+    const tablerosRows = await supabaseRequest('tableros?select=*&visible=eq.true&order=orden.asc');
+    state.tableros = Array.isArray(tablerosRows) ? tablerosRows : [];
+    renderTableros();
+
+    setSourceStatus('live', tableroId ? 'Tablero actualizado' : 'Tablero agregado');
+  } catch (e) {
+    console.error('Error guardando tablero:', e);
+    errorEl.textContent = 'Error al guardar. Revisa la conexión con Supabase.';
+    errorEl.style.display = 'block';
+    saveBtn.disabled = false;
+    saveBtn.textContent = tableroId ? 'Guardar cambios' : 'Agregar tablero';
+  }
+}
+
+async function deleteTablero(tableroId) {
+  if (!confirm('¿Estás seguro de eliminar este tablero? Esta acción no se puede deshacer.')) {
+    return;
+  }
+
+  const deleteBtn = document.querySelector('.tablero-btn-delete');
+  if (deleteBtn) {
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Eliminando...';
+  }
+
+  try {
+    await supabaseRequest(`tableros?id=eq.${tableroId}`, {
+      method: 'DELETE',
+      headers: { 'Prefer': 'return=minimal' }
+    });
+
+    closeTableroForm();
+
+    // Recargar tableros
+    const tablerosRows = await supabaseRequest('tableros?select=*&visible=eq.true&order=orden.asc');
+    state.tableros = Array.isArray(tablerosRows) ? tablerosRows : [];
+    renderTableros();
+
+    setSourceStatus('live', 'Tablero eliminado');
+  } catch (e) {
+    console.error('Error eliminando tablero:', e);
+    alert('Error al eliminar. Revisa la conexión.');
+    if (deleteBtn) {
+      deleteBtn.disabled = false;
+      deleteBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Eliminar';
+    }
+  }
 }
 
 /* ==========================================================
