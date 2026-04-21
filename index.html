@@ -1625,7 +1625,7 @@ input { font-family: inherit; }
 
 .tableros-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.25rem;
 }
 
@@ -1635,135 +1635,176 @@ input { font-family: inherit; }
   }
 }
 
+/* Link que envuelve la card completa */
+.tablero-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .tablero-card {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-xs);
-  transition: all var(--duration);
+  transition: all 0.25s var(--ease);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .tablero-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--royal-10);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(20, 31, 77, 0.15);
+  border-color: var(--card-accent, var(--royal));
 }
 
-.tablero-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 1rem 1.15rem;
-  gap: 0.85rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-subtle);
-}
-
-.tablero-card-title-block {
-  flex: 1;
-  min-width: 0;
-}
-
-.tablero-card-title {
-  font-size: 14.5px;
-  font-weight: 700;
-  color: var(--deep);
-  letter-spacing: -0.015em;
-  line-height: 1.3;
-  margin-bottom: 3px;
-}
-
-.tablero-card-desc {
-  font-size: 11.5px;
-  color: var(--text-dim);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.tablero-card-open {
+/* Visual con gradiente de la categoría */
+.tablero-card-visual {
+  height: 140px;
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background: var(--royal);
-  color: #FFFFFF;
-  border-radius: 7px;
-  text-decoration: none;
-  font-size: 11.5px;
-  font-weight: 700;
-  white-space: nowrap;
-  transition: all var(--duration);
-  flex-shrink: 0;
-}
-
-.tablero-card-open:hover {
-  background: var(--deep);
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(31, 73, 182, 0.3);
-}
-
-.tablero-card-open svg {
-  width: 12px;
-  height: 12px;
-}
-
-.tablero-card-preview {
-  position: relative;
-  height: 340px;
-  background: var(--bg-subtle);
+  justify-content: center;
   overflow: hidden;
 }
 
-.tablero-card-preview iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  display: block;
+.tablero-card-icono {
+  font-size: 52px;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  transition: transform 0.3s var(--ease);
 }
 
-/* Overlay que aparece en hover sobre el iframe para "Ver completo" */
-.tablero-card-overlay {
+.tablero-card:hover .tablero-card-icono {
+  transform: scale(1.1) translateY(-2px);
+}
+
+/* Patrón decorativo de fondo tipo grilla */
+.tablero-card-pattern {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(20, 31, 77, 0.7);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.tablero-card-visual::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  z-index: 1;
+}
+
+.tablero-card-info {
+  padding: 1.15rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.tablero-card-info-main {
+  flex: 1;
+}
+
+.tablero-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--deep);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+.tablero-card-desc {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.tablero-card-category-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 10px;
+  border: 1px solid;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.tablero-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.tablero-card-open-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--card-accent, var(--royal));
+  transition: gap 0.2s var(--ease);
+}
+
+.tablero-card:hover .tablero-card-open-btn {
+  gap: 10px;
+}
+
+.tablero-card-open-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.tablero-card-edit-btn {
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  transition: opacity var(--duration);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
   cursor: pointer;
-  backdrop-filter: blur(2px);
+  color: var(--text-dim);
+  transition: all var(--duration);
+  padding: 0;
+  font-family: inherit;
+  flex-shrink: 0;
 }
 
-.tablero-card:hover .tablero-card-overlay {
-  opacity: 1;
+.tablero-card-edit-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--royal);
+  border-color: var(--royal);
 }
 
-.tablero-card-overlay-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  background: #FFFFFF;
-  color: var(--deep);
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 13px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  transform: translateY(10px);
-  transition: transform var(--duration);
-}
-
-.tablero-card:hover .tablero-card-overlay-btn {
-  transform: translateY(0);
-}
-
-.tablero-card-overlay-btn svg {
-  width: 14px;
-  height: 14px;
+.tablero-card-edit-btn svg {
+  width: 13px;
+  height: 13px;
 }
 
 .tableros-empty {
@@ -9017,11 +9058,12 @@ function buildSidebar() {
       const id = el.dataset.quick;
       state.filters.quick = id === 'all' ? null : id;
 
-      // Si estamos en Mi semana y se activa un filtro real, saltar a Lista
-      // (Mi semana tiene sus propias columnas fijas que no respetan filtros)
-      if (state.view === 'home' && state.filters.quick) {
+      // Si estamos en una vista que no respeta filtros (Mi semana, Tableros, Métricas),
+      // saltar a Lista para mostrar los resultados filtrados
+      const vistasSinFiltro = ['home', 'tableros', 'metrics'];
+      if (vistasSinFiltro.includes(state.view) && state.filters.quick) {
         setActiveView('checklist');
-        return; // setActiveView ya llama a renderAll
+        return;
       }
 
       buildSidebar();
@@ -9097,8 +9139,9 @@ function buildSidebar() {
       if (state.filters[setKey].has(value)) state.filters[setKey].delete(value);
       else state.filters[setKey].add(value);
 
-      // Si estamos en Mi semana, saltar a Lista (Mi semana no respeta filtros)
-      if (state.view === 'home') {
+      // Si estamos en una vista que no respeta filtros, saltar a Lista
+      const vistasSinFiltro = ['home', 'tableros', 'metrics'];
+      if (vistasSinFiltro.includes(state.view)) {
         setActiveView('checklist');
         return;
       }
@@ -9137,8 +9180,9 @@ function bindControls() {
     state.filters.search = e.target.value.toLowerCase();
     searchBox.classList.toggle('has-value', !!e.target.value);
 
-    // Si estamos en Mi semana y el usuario busca algo, saltar a Lista
-    if (state.view === 'home' && e.target.value) {
+    // Si estamos en una vista que no respeta filtros y el usuario busca algo, saltar a Lista
+    const vistasSinFiltro = ['home', 'tableros', 'metrics'];
+    if (vistasSinFiltro.includes(state.view) && e.target.value) {
       setActiveView('checklist');
       return;
     }
@@ -10111,46 +10155,65 @@ function renderTableros() {
 }
 
 function renderTableroCard(t) {
-  const embedUrl = t.embed_url || t.tableau_url;
   const openUrl = t.tableau_url;
 
+  // Icono según la categoría (o primera letra del título si no hay match)
+  const iconoPorCategoria = {
+    'Ejecutivos': '📊',
+    'Operaciones': '⚙️',
+    'Canales': '🌐',
+    'Marketing': '📢',
+    'Producto': '🧩',
+    'Growth': '📈',
+    'Finanzas': '💰',
+    'Ventas': '💼',
+    'Análisis': '🔍',
+    'General': '📋'
+  };
+  const icono = iconoPorCategoria[t.categoria] || '📋';
+
+  // Color del acento según la categoría (hash de la categoría → color)
+  const categoriaColor = (cat) => {
+    const colors = [
+      { bg: 'linear-gradient(135deg, #1F49B6 0%, #203478 100%)', accent: '#1F49B6' }, // Royal
+      { bg: 'linear-gradient(135deg, #16A34A 0%, #15803D 100%)', accent: '#16A34A' }, // Verde
+      { bg: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', accent: '#F59E0B' }, // Ámbar
+      { bg: 'linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%)', accent: '#7C3AED' }, // Violeta
+      { bg: 'linear-gradient(135deg, #0891B2 0%, #0E7490 100%)', accent: '#0891B2' }, // Cyan
+      { bg: 'linear-gradient(135deg, #DC2626 0%, #991B1B 100%)', accent: '#DC2626' }  // Rojo
+    ];
+    if (!cat) return colors[0];
+    let hash = 0;
+    for (let i = 0; i < cat.length; i++) hash += cat.charCodeAt(i);
+    return colors[hash % colors.length];
+  };
+  const colorInfo = categoriaColor(t.categoria);
+
   return `
-    <div class="tablero-card">
-      <div class="tablero-card-header">
-        <div class="tablero-card-title-block">
-          <div class="tablero-card-title">${escapeHtml(t.titulo)}</div>
-          ${t.descripcion ? `<div class="tablero-card-desc">${escapeHtml(t.descripcion)}</div>` : ''}
+    <a href="${openUrl}" target="_blank" rel="noopener noreferrer" class="tablero-card-link">
+      <div class="tablero-card" style="--card-accent: ${colorInfo.accent}">
+        <div class="tablero-card-visual" style="background: ${colorInfo.bg}">
+          <div class="tablero-card-icono">${icono}</div>
+          <div class="tablero-card-pattern"></div>
         </div>
-        <div class="tablero-card-actions">
-          <button class="tablero-card-menu-btn" onclick="openTableroForm(${t.id})" title="Editar tablero">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <a href="${openUrl}" target="_blank" rel="noopener noreferrer" class="tablero-card-open" title="Abrir en Tableau">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-            <span>Abrir</span>
-          </a>
-        </div>
-      </div>
-      <div class="tablero-card-preview">
-        <iframe
-          src="${embedUrl}"
-          title="${escapeHtml(t.titulo)}"
-          loading="lazy"
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-          frameborder="0">
-        </iframe>
-        <div class="tablero-card-overlay" onclick="window.open('${openUrl}', '_blank', 'noopener')">
-          <div class="tablero-card-overlay-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Ver completo
+        <div class="tablero-card-info">
+          <div class="tablero-card-info-main">
+            <div class="tablero-card-title">${escapeHtml(t.titulo)}</div>
+            ${t.descripcion ? `<div class="tablero-card-desc">${escapeHtml(t.descripcion)}</div>` : ''}
+            ${t.categoria ? `<div class="tablero-card-category-tag" style="color: ${colorInfo.accent}; border-color: ${colorInfo.accent}33; background: ${colorInfo.accent}0D">${escapeHtml(t.categoria)}</div>` : ''}
+          </div>
+          <div class="tablero-card-footer">
+            <div class="tablero-card-open-btn">
+              <span>Abrir tablero</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </div>
+            <button class="tablero-card-edit-btn" onclick="event.preventDefault(); event.stopPropagation(); openTableroForm(${t.id})" title="Editar tablero">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </a>
   `;
 }
 
@@ -10212,14 +10275,6 @@ function openTableroForm(tableroId) {
           <div class="tablero-form-hint">Menor número aparece primero. Usa múltiplos de 10 para facilitar reordenar después.</div>
         </div>
 
-        <div id="tf-preview-container" style="display:none">
-          <label>Preview</label>
-          <div class="tablero-form-preview">
-            <iframe id="tf-preview-iframe" loading="lazy" frameborder="0"></iframe>
-          </div>
-          <div class="tablero-form-hint">Si no se ve, asegúrate de estar logueado en Tableau en este navegador.</div>
-        </div>
-
         <div id="tf-error" class="tablero-form-error" style="display:none"></div>
       </div>
       <div class="tablero-modal-footer">
@@ -10230,7 +10285,7 @@ function openTableroForm(tableroId) {
           </button>
         ` : '<div></div>'}
         <div class="tablero-modal-footer-right">
-          <button class="tablero-btn-secondary" onclick="testTableroUrl()">Probar URL</button>
+          <button class="tablero-btn-secondary" onclick="testTableroUrl()">Abrir URL</button>
           <button class="tablero-btn-primary" onclick="saveTablero(${tableroId || 'null'})">
             ${isEdit ? 'Guardar cambios' : 'Agregar tablero'}
           </button>
@@ -10279,17 +10334,15 @@ function buildEmbedUrl(url) {
   return embed;
 }
 
-// Probar el URL y mostrar preview
+// Verifica el URL abriéndolo en nueva pestaña (ya que no usamos iframe)
 function testTableroUrl() {
   const url = document.getElementById('tf-url').value.trim();
   const errorEl = document.getElementById('tf-error');
-  const previewContainer = document.getElementById('tf-preview-container');
-  const iframe = document.getElementById('tf-preview-iframe');
 
   errorEl.style.display = 'none';
 
   if (!url) {
-    errorEl.textContent = 'Pega un URL para probar';
+    errorEl.textContent = 'Pega un URL para verificar';
     errorEl.style.display = 'block';
     return;
   }
@@ -10300,9 +10353,8 @@ function testTableroUrl() {
     return;
   }
 
-  const embedUrl = buildEmbedUrl(url);
-  iframe.src = embedUrl;
-  previewContainer.style.display = 'block';
+  // Abrir el URL en nueva pestaña para verificar que carga correctamente
+  window.open(url, '_blank', 'noopener');
 }
 
 async function saveTablero(tableroId) {
