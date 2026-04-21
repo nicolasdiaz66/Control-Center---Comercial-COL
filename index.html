@@ -3053,7 +3053,8 @@ input { font-family: inherit; }
 .gantt-legend {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1rem;
   padding: 0.75rem 1rem;
   background: var(--bg);
@@ -3061,6 +3062,71 @@ input { font-family: inherit; }
   border-radius: var(--radius);
   box-shadow: var(--shadow-xs);
   flex-wrap: wrap;
+}
+
+.gantt-legend-items {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* Controles de zoom */
+.gantt-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.gantt-zoom-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-right: 0.25rem;
+}
+
+.gantt-zoom-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 5px 11px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--duration);
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.gantt-zoom-btn:hover {
+  background: var(--royal-10);
+  color: var(--royal);
+  border-color: var(--royal);
+}
+
+.gantt-zoom-btn.active {
+  background: var(--royal);
+  color: #FFFFFF;
+  border-color: var(--royal);
+  box-shadow: 0 2px 6px rgba(31, 73, 182, 0.25);
+}
+
+.gantt-goto-today {
+  margin-left: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 8px;
+}
+
+.gantt-goto-today svg {
+  width: 14px;
+  height: 14px;
 }
 
 .gantt-legend-item {
@@ -3089,7 +3155,6 @@ input { font-family: inherit; }
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  margin-left: auto;
   font-size: 11.5px;
   font-weight: 700;
   color: var(--royal);
@@ -3130,7 +3195,7 @@ input { font-family: inherit; }
 
 .gantt-months-track {
   position: relative;
-  height: 44px;
+  height: 56px;
   background: var(--bg);
 }
 
@@ -3140,16 +3205,23 @@ input { font-family: inherit; }
   bottom: 0;
   border-right: 1px solid var(--border);
   display: flex;
-  align-items: center;
-  padding-left: 0.75rem;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.gantt-month-cell:last-child { border-right: none; }
+
+.gantt-month-label {
+  padding: 4px 0.75rem 2px;
   font-size: 12.5px;
   font-weight: 700;
   color: var(--deep);
   letter-spacing: -0.015em;
-  white-space: nowrap;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
-
-.gantt-month-cell:last-child { border-right: none; }
 
 .gantt-month-cell .year {
   font-size: 10px;
@@ -3158,9 +3230,55 @@ input { font-family: inherit; }
   font-weight: 500;
 }
 
-.gantt-month-cell.current {
+.gantt-month-cell.current .gantt-month-label {
   color: var(--royal);
-  background: linear-gradient(to bottom, var(--royal-04) 0%, transparent 100%);
+  background: var(--royal-04);
+}
+
+/* Subdivisiones: días y semanas */
+.gantt-month-subdivs {
+  position: relative;
+  flex: 1;
+  display: block;
+}
+
+.gantt-day-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid var(--border);
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration);
+}
+
+.gantt-day-tick.weekend {
+  background: rgba(203, 213, 225, 0.15);
+  color: var(--text-faint);
+}
+
+.gantt-day-tick.today {
+  background: var(--royal);
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 10px;
+}
+
+.gantt-week-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  border-left: 1px dashed var(--border);
+  font-size: 9px;
+  color: var(--text-faint);
+  padding: 2px 0 0 3px;
+  white-space: nowrap;
+  font-weight: 600;
 }
 
 /* Cuerpo del Gantt */
@@ -7781,6 +7899,7 @@ let state = {
   reuniones: [],    // reuniones cacheadas de Google Calendar
   reunionesPanelCollapsed: false,  // estado colapsado del panel lateral
   tableros: [],     // tableros de Tableau desde Supabase
+  ganttZoom: 'month',  // 'day' | 'week' | 'month' | 'quarter' | 'all'
 };
 
 async function init() {
@@ -9667,13 +9786,29 @@ function renderGantt() {
     return bc - ac;
   });
 
-  // Ancho de cada mes (píxeles) - responsivo según tamaño de pantalla
-  const viewportW = window.innerWidth;
-  const labelW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) || 280;
-  const availableW = viewportW - labelW - 100; // restar sidebar y márgenes
-  // Idealmente queremos ver al menos 3-4 meses sin scroll
-  const idealMonthW = Math.max(120, Math.min(200, availableW / Math.min(months.length, 5)));
-  const monthWidth = Math.round(idealMonthW);
+  // Ancho de cada mes según nivel de zoom
+  // 'day': súper amplio (cada día ~60px = 1800px/mes)
+  // 'week': amplio (cada día ~25px = 750px/mes)
+  // 'month': mediano (cada día ~8px = 240px/mes)
+  // 'quarter': compacto (cada día ~4px = 120px/mes)
+  // 'all': se ajusta al viewport
+  const zoomWidths = {
+    'day': 1800,
+    'week': 750,
+    'month': 240,
+    'quarter': 120
+  };
+
+  let monthWidth;
+  if (state.ganttZoom === 'all') {
+    // Ajustar para que todos los meses quepan en el viewport
+    const viewportW = window.innerWidth;
+    const labelW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) || 280;
+    const availableW = viewportW - labelW - 100;
+    monthWidth = Math.max(100, Math.round(availableW / months.length));
+  } else {
+    monthWidth = zoomWidths[state.ganttZoom] || 240;
+  }
   const trackWidth = months.length * monthWidth;
 
   // Helper: convertir fecha a pixel
@@ -9682,11 +9817,8 @@ function renderGantt() {
       m.getFullYear() === date.getFullYear() && m.getMonth() === date.getMonth()
     );
     if (monthIdx === -1) {
-      // Fecha fuera del rango (no debería pasar porque min/max vienen de la data)
       console.warn('[Gantt] Fecha fuera de rango:', date);
-      // Si es anterior al rango, ponerla al principio
       if (date < months[0]) return 5;
-      // Si es posterior, al final
       return months.length * monthWidth - 15;
     }
     const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -9733,28 +9865,73 @@ function renderGantt() {
 
   html += `
     <div class="gantt-legend">
-      <div class="gantt-legend-item"><div class="gantt-legend-dot done"></div>Finalizado</div>
-      <div class="gantt-legend-item"><div class="gantt-legend-dot progress"></div>En proceso</div>
-      <div class="gantt-legend-item"><div class="gantt-legend-dot pending"></div>Pendiente</div>
-      <div class="gantt-legend-item"><div class="gantt-legend-dot scheduled"></div>Agendado</div>
-      <div class="gantt-legend-item"><div class="gantt-legend-dot overdue"></div>Vencida</div>
-      ${todayX !== null ? '<div class="gantt-legend-today">HOY</div>' : ''}
+      <div class="gantt-legend-items">
+        <div class="gantt-legend-item"><div class="gantt-legend-dot done"></div>Finalizado</div>
+        <div class="gantt-legend-item"><div class="gantt-legend-dot progress"></div>En proceso</div>
+        <div class="gantt-legend-item"><div class="gantt-legend-dot pending"></div>Pendiente</div>
+        <div class="gantt-legend-item"><div class="gantt-legend-dot scheduled"></div>Agendado</div>
+        <div class="gantt-legend-item"><div class="gantt-legend-dot overdue"></div>Vencida</div>
+        ${todayX !== null ? '<div class="gantt-legend-today">HOY</div>' : ''}
+      </div>
+      <div class="gantt-zoom-controls">
+        <span class="gantt-zoom-label">Zoom:</span>
+        <button class="gantt-zoom-btn ${state.ganttZoom === 'day' ? 'active' : ''}" onclick="setGanttZoom('day')" title="Vista diaria — cada día es una columna">Día</button>
+        <button class="gantt-zoom-btn ${state.ganttZoom === 'week' ? 'active' : ''}" onclick="setGanttZoom('week')" title="Vista semanal — ticks cada lunes">Semana</button>
+        <button class="gantt-zoom-btn ${state.ganttZoom === 'month' ? 'active' : ''}" onclick="setGanttZoom('month')" title="Vista mensual — balance default">Mes</button>
+        <button class="gantt-zoom-btn ${state.ganttZoom === 'quarter' ? 'active' : ''}" onclick="setGanttZoom('quarter')" title="Vista trimestral — más comprimida">Trim.</button>
+        <button class="gantt-zoom-btn ${state.ganttZoom === 'all' ? 'active' : ''}" onclick="setGanttZoom('all')" title="Ajustar al tamaño de pantalla">Todo</button>
+        ${todayX !== null ? `<button class="gantt-zoom-btn gantt-goto-today" onclick="scrollGanttToToday()" title="Ir a hoy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="12" x2="12" y2="7"/><line x1="12" y1="12" x2="15" y2="13"/></svg>
+        </button>` : ''}
+      </div>
     </div>
   `;
 
   // Container
   html += `<div class="gantt-container" style="width:${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) + trackWidth}px">`;
 
-  // Header meses
+  // Header meses (con subdivisiones según zoom)
+  const showDays = state.ganttZoom === 'day';
+  const showWeeks = state.ganttZoom === 'week';
+
   html += `
     <div class="gantt-months">
       <div class="gantt-months-label">Frente · Proyecto</div>
       <div class="gantt-months-track" style="width:${trackWidth}px">
         ${months.map((m, i) => {
           const isCurrent = m.getMonth() === nowMonth && m.getFullYear() === nowYear;
+          const daysInMonth = new Date(m.getFullYear(), m.getMonth() + 1, 0).getDate();
+          const dayW = monthWidth / daysInMonth;
+
+          let subdivisions = '';
+          if (showDays) {
+            // Un tick por cada día
+            subdivisions = `<div class="gantt-month-subdivs">`;
+            for (let d = 1; d <= daysInMonth; d++) {
+              const isToday = m.getFullYear() === now.getFullYear() && m.getMonth() === now.getMonth() && d === now.getDate();
+              const dayDate = new Date(m.getFullYear(), m.getMonth(), d);
+              const dayOfWeek = dayDate.getDay(); // 0=domingo, 6=sábado
+              const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+              subdivisions += `<div class="gantt-day-tick ${isToday ? 'today' : ''} ${isWeekend ? 'weekend' : ''}" style="left:${(d-1)*dayW}px; width:${dayW}px">${d}</div>`;
+            }
+            subdivisions += `</div>`;
+          } else if (showWeeks) {
+            // Un tick por cada semana (lunes)
+            subdivisions = `<div class="gantt-month-subdivs">`;
+            for (let d = 1; d <= daysInMonth; d++) {
+              const dayDate = new Date(m.getFullYear(), m.getMonth(), d);
+              if (dayDate.getDay() === 1 || d === 1) { // lunes o día 1
+                const label = d === 1 ? '1' : `${d}`;
+                subdivisions += `<div class="gantt-week-tick" style="left:${(d-1)*dayW}px">${label}</div>`;
+              }
+            }
+            subdivisions += `</div>`;
+          }
+
           return `
             <div class="gantt-month-cell ${isCurrent ? 'current' : ''}" style="left:${i*monthWidth}px; width:${monthWidth}px">
-              ${MES_LARGO[m.getMonth()]}<span class="year">'${String(m.getFullYear()).slice(-2)}</span>
+              <div class="gantt-month-label">${MES_LARGO[m.getMonth()]}<span class="year">'${String(m.getFullYear()).slice(-2)}</span></div>
+              ${subdivisions}
             </div>
           `;
         }).join('')}
@@ -9922,6 +10099,33 @@ function toggleOverdueList(event) {
     list.style.display = 'none';
     btn.textContent = 'Ver lista';
   }
+}
+
+// Cambiar nivel de zoom del Gantt
+function setGanttZoom(nivel) {
+  state.ganttZoom = nivel;
+  renderGantt();
+  // Auto-scroll a hoy después del re-render
+  setTimeout(scrollGanttToToday, 100);
+}
+
+// Scroll horizontal del Gantt para centrar el día de hoy
+function scrollGanttToToday() {
+  const container = document.getElementById('gantt');
+  if (!container) return;
+  const todayLine = container.querySelector('.gantt-today-line');
+  if (!todayLine) return;
+
+  const scrollContainer = container.closest('.gantt-wrap') || container;
+  const todayX = parseInt(todayLine.style.left) || 0;
+  const labelColW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) || 280;
+
+  // Centrar el hoy en la pantalla
+  const targetScroll = todayX - scrollContainer.clientWidth / 2;
+  scrollContainer.scrollTo({
+    left: Math.max(0, targetScroll),
+    behavior: 'smooth'
+  });
 }
 
 function renderGanttMarker(t, px, now, isInGroup) {
