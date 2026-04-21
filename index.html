@@ -2912,12 +2912,130 @@ input { font-family: inherit; }
 ========================================================== */
 .gantt-wrap {
   padding: 1.5rem 2rem 3rem;
+  position: relative;
+}
+
+/* Viewport scrolleable */
+.gantt-scroll-viewport {
   overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  /* Scrollbar visible y cómoda */
+  scrollbar-width: auto;
+  scrollbar-color: var(--royal) var(--bg-subtle);
+}
+
+.gantt-scroll-viewport::-webkit-scrollbar {
+  height: 12px;
+}
+
+.gantt-scroll-viewport::-webkit-scrollbar-track {
+  background: var(--bg-subtle);
+  border-radius: 6px;
+  margin: 0 60px; /* dejar espacio por las arrows laterales */
+}
+
+.gantt-scroll-viewport::-webkit-scrollbar-thumb {
+  background: var(--royal);
+  border-radius: 6px;
+  border: 2px solid var(--bg-subtle);
+  min-width: 40px;
+}
+
+.gantt-scroll-viewport::-webkit-scrollbar-thumb:hover {
+  background: var(--deep);
 }
 
 .gantt-container {
   min-width: 1400px;
   position: relative;
+}
+
+/* Wrapper que contiene viewport + arrows + shadows */
+.gantt-scroll-wrapper {
+  position: relative;
+}
+
+/* Flechas flotantes de navegación (aparecen cuando hay overflow) */
+.gantt-nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 16px rgba(20, 31, 77, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  color: var(--royal);
+  padding: 0;
+  font-family: inherit;
+  opacity: 0.95;
+}
+
+.gantt-nav-arrow:hover:not(:disabled) {
+  background: var(--royal);
+  color: #FFFFFF;
+  border-color: var(--royal);
+  box-shadow: 0 6px 20px rgba(31, 73, 182, 0.4);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.gantt-nav-arrow:active:not(:disabled) {
+  transform: translateY(-50%) scale(0.96);
+}
+
+.gantt-nav-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gantt-nav-arrow svg {
+  width: 22px;
+  height: 22px;
+}
+
+.gantt-nav-arrow.left {
+  left: 16px;
+}
+
+.gantt-nav-arrow.right {
+  right: 16px;
+}
+
+/* Gradientes sutiles indicando que hay más contenido a los lados */
+.gantt-scroll-shadow {
+  position: absolute;
+  top: 0;
+  bottom: 12px; /* sobre el scrollbar */
+  width: 60px;
+  pointer-events: none;
+  z-index: 15;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease);
+}
+
+.gantt-scroll-shadow.left {
+  left: 0;
+  background: linear-gradient(to right, rgba(248, 250, 252, 0.95) 0%, transparent 100%);
+}
+
+.gantt-scroll-shadow.right {
+  right: 0;
+  background: linear-gradient(to left, rgba(248, 250, 252, 0.95) 0%, transparent 100%);
+}
+
+.gantt-scroll-shadow.visible {
+  opacity: 1;
 }
 
 /* Banner de actividades vencidas */
@@ -9887,7 +10005,21 @@ function renderGantt() {
     </div>
   `;
 
-  // Container
+  // Viewport scrolleable + arrows laterales + shadows indicadoras
+  html += `
+    <div class="gantt-scroll-wrapper">
+      <button class="gantt-nav-arrow left" id="gantt-nav-left" onclick="scrollGantt('left')" title="Desplazar a la izquierda">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button class="gantt-nav-arrow right" id="gantt-nav-right" onclick="scrollGantt('right')" title="Desplazar a la derecha">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <div class="gantt-scroll-shadow left" id="gantt-shadow-left"></div>
+      <div class="gantt-scroll-shadow right" id="gantt-shadow-right"></div>
+      <div class="gantt-scroll-viewport" id="gantt-scroll-viewport">
+  `;
+
+  // Container (dentro del viewport)
   html += `<div class="gantt-container" style="width:${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) + trackWidth}px">`;
 
   // Header meses (con subdivisiones según zoom)
@@ -10021,6 +10153,7 @@ function renderGantt() {
 
   html += `</div>`; // body
   html += `</div>`; // container
+  html += `</div></div>`; // cerrar gantt-scroll-viewport y gantt-scroll-wrapper
 
   container.innerHTML = html;
 
@@ -10074,15 +10207,23 @@ function renderGantt() {
     });
   });
 
-  // Auto-scroll al mes actual para que las marquillas se vean inmediatamente
+  // Auto-scroll al hoy y bind de listeners para indicadores
   setTimeout(() => {
+    const viewport = document.getElementById('gantt-scroll-viewport');
+    if (!viewport) return;
+
+    // Listener: actualizar arrows y shadows cada vez que el usuario scrollea
+    viewport.addEventListener('scroll', updateGanttScrollIndicators);
+
+    // Scroll inicial a hoy
     if (todayX !== null) {
-      const scrollContainer = container.closest('.gantt-wrap') || container;
       const labelColW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) || 280;
-      // Centrar el "hoy" en la pantalla
-      const targetScroll = labelColW + todayX - scrollContainer.clientWidth / 2;
-      scrollContainer.scrollLeft = Math.max(0, targetScroll);
+      const targetScroll = labelColW + todayX - viewport.clientWidth / 2;
+      viewport.scrollLeft = Math.max(0, targetScroll);
     }
+
+    // Actualizar indicadores iniciales
+    updateGanttScrollIndicators();
   }, 50);
 }
 
@@ -10111,21 +10252,53 @@ function setGanttZoom(nivel) {
 
 // Scroll horizontal del Gantt para centrar el día de hoy
 function scrollGanttToToday() {
-  const container = document.getElementById('gantt');
-  if (!container) return;
-  const todayLine = container.querySelector('.gantt-today-line');
+  const viewport = document.getElementById('gantt-scroll-viewport');
+  if (!viewport) return;
+  const todayLine = viewport.querySelector('.gantt-today-line');
   if (!todayLine) return;
 
-  const scrollContainer = container.closest('.gantt-wrap') || container;
   const todayX = parseInt(todayLine.style.left) || 0;
-  const labelColW = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--label-col-w')) || 280;
 
-  // Centrar el hoy en la pantalla
-  const targetScroll = todayX - scrollContainer.clientWidth / 2;
-  scrollContainer.scrollTo({
+  const targetScroll = todayX - viewport.clientWidth / 2;
+  viewport.scrollTo({
     left: Math.max(0, targetScroll),
     behavior: 'smooth'
   });
+}
+
+// Scroll horizontal con flechas laterales
+function scrollGantt(direction) {
+  const viewport = document.getElementById('gantt-scroll-viewport');
+  if (!viewport) return;
+
+  // Desplazar una "página" (80% del ancho visible)
+  const step = Math.round(viewport.clientWidth * 0.8);
+  const delta = direction === 'left' ? -step : step;
+
+  viewport.scrollBy({
+    left: delta,
+    behavior: 'smooth'
+  });
+}
+
+// Actualiza visibilidad de arrows y shadows según posición del scroll
+function updateGanttScrollIndicators() {
+  const viewport = document.getElementById('gantt-scroll-viewport');
+  if (!viewport) return;
+
+  const leftArrow = document.getElementById('gantt-nav-left');
+  const rightArrow = document.getElementById('gantt-nav-right');
+  const leftShadow = document.getElementById('gantt-shadow-left');
+  const rightShadow = document.getElementById('gantt-shadow-right');
+
+  const canScrollLeft = viewport.scrollLeft > 10;
+  const canScrollRight = viewport.scrollLeft < (viewport.scrollWidth - viewport.clientWidth - 10);
+
+  if (leftArrow) leftArrow.disabled = !canScrollLeft;
+  if (rightArrow) rightArrow.disabled = !canScrollRight;
+
+  if (leftShadow) leftShadow.classList.toggle('visible', canScrollLeft);
+  if (rightShadow) rightShadow.classList.toggle('visible', canScrollRight);
 }
 
 function renderGanttMarker(t, px, now, isInGroup) {
