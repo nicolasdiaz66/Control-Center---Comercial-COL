@@ -8371,81 +8371,11 @@ function renderHome() {
     statusHtml = `<strong>${totalSemana}</strong> esta semana y <span class="status-pill bad">${vencidas.length} vencidas</span> requieren atención`;
   }
 
-  // Calcular burn rate para el hero
-  const total = state.data.length;
-  const done = state.data.filter(d => d.estado.toLowerCase() === 'finalizado').length;
-  const pct = total ? Math.round(done/total*100) : 0;
-  const restantes = total - done;
-
-  // Proyección simple: si llevamos X días desde el inicio del año, y hemos cerrado Y, extrapolamos
-  const inicioAnio = new Date(2026, 0, 1);
-  const diasTranscurridos = Math.max(1, Math.round((today - inicioAnio) / 86400000));
-  const finAnio = new Date(2026, 11, 31);
-  const diasRestantes = Math.max(1, Math.round((finAnio - today) / 86400000));
-  const velocityDaily = done / diasTranscurridos;
-  const diasNecesarios = velocityDaily > 0 ? Math.round(restantes / velocityDaily) : 999;
-  const fechaProyectada = new Date(today.getTime() + diasNecesarios * 86400000);
-
-  let burnText, burnTag;
-  if (restantes === 0) {
-    burnText = 'Plan completado 🎉';
-    burnTag = 'good';
-  } else if (fechaProyectada <= finAnio) {
-    const mesProyectado = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][fechaProyectada.getMonth()];
-    burnText = `Al ritmo actual terminas en <strong>${mesProyectado} ${fechaProyectada.getFullYear()}</strong>`;
-    burnTag = 'good';
-  } else {
-    const diasAtraso = Math.round((fechaProyectada - finAnio) / 86400000);
-    burnText = `Al ritmo actual terminas <strong>${diasAtraso} días</strong> después de diciembre`;
-    burnTag = 'warn';
-  }
-
-  // Mini chart: completadas por semana (últimas 8 semanas) - aproximación usando fechas
-  const semanas = 8;
-  const puntos = [];
-  for (let i = semanas - 1; i >= 0; i--) {
-    const inicioSemana = new Date(today.getTime() - (i + 1) * 7 * 86400000);
-    const finSemana = new Date(today.getTime() - i * 7 * 86400000);
-    const count = state.data.filter(d =>
-      d.estado.toLowerCase() === 'finalizado' &&
-      d.fecha && d.fecha >= inicioSemana && d.fecha < finSemana
-    ).length;
-    puntos.push(count);
-  }
-  const maxPunto = Math.max(...puntos, 1);
-  const sparklinePath = puntos.map((p, i) => {
-    const x = (i / (semanas - 1)) * 140;
-    const y = 32 - (p / maxPunto) * 28;
-    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
-  }).join(' ');
-
   let html = `
     <div class="home-hero">
       <div class="home-greeting">${fechaFmt}</div>
       <div class="home-title">${saludo}, Nicolás 👋</div>
       <div class="home-status">${statusHtml}</div>
-
-      <div class="home-burn">
-        <div>
-          <div class="home-burn-label">Proyección</div>
-          <div class="home-burn-value">${burnText} · ${done}/${total} completadas (${pct}%)</div>
-        </div>
-        <svg class="home-burn-chart" viewBox="0 0 140 40">
-          <defs>
-            <linearGradient id="sparklineGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="rgba(143, 177, 255, 0.5)"/>
-              <stop offset="100%" stop-color="rgba(143, 177, 255, 0)"/>
-            </linearGradient>
-          </defs>
-          <path d="${sparklinePath} L 140 32 L 0 32 Z" fill="url(#sparklineGrad)"/>
-          <path d="${sparklinePath}" fill="none" stroke="#8FB1FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          ${puntos.map((p, i) => {
-            const x = (i / (semanas - 1)) * 140;
-            const y = 32 - (p / maxPunto) * 28;
-            return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i === puntos.length - 1 ? 2.5 : 1.5}" fill="#8FB1FF"/>`;
-          }).join('')}
-        </svg>
-      </div>
     </div>
 
     <div class="home-main-layout${state.reunionesPanelCollapsed ? ' panel-collapsed' : ''}">
